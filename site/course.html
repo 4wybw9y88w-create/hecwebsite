@@ -45,6 +45,21 @@ a{color:var(--acc);font-weight:700}
   if(r.status===404)return fail('This course has not been uploaded yet.');
   if(!r.ok)return fail('Could not open the course. Try again in a moment.');
   var html=await r.text();
+  // Progress sync: the course pages save to window.claude's "db"/"user" when it exists. Here it is backed by this account's own rows.
+  var uid=s.user.id;
+  try{ if(localStorage.getItem('hec_uid')!==uid){ // another account used this browser: don't mix progress
+    Object.keys(localStorage).filter(function(k){return k.indexOf('sb-')!==0}).forEach(function(k){localStorage.removeItem(k)});
+    localStorage.setItem('hec_uid',uid)} }catch(e){}
+  window.claude={use:function(name){
+    if(name==='user')return Promise.resolve({id:function(){return Promise.resolve(uid)}});
+    if(name!=='db')return Promise.resolve(null);
+    return Promise.resolve({doc:function(path){
+      var key=String(path).split('/').pop();
+      return {
+        get:function(){return sb.from('progress').select('state,updated').eq('key',key).maybeSingle().then(function(x){
+          if(x.error)throw x.error;var d=x.data;return {exists:!!d,data:function(){return d?{state:d.state,updated:d.updated}:undefined}}})},
+        set:function(o){return sb.from('progress').upsert({user_id:uid,key:key,state:String(o.state),updated:o.updated||Date.now()}).then(function(x){if(x.error)throw x.error})}
+      }}})}};
   document.open();document.write(html);document.close(); // replaces this page with the course
  }catch(e){fail('Could not open the course. Check your connection and try again.')}
 })();
