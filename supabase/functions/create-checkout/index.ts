@@ -14,7 +14,7 @@ export async function handle(req: Request): Promise<Response> {
     if (await hasEntitlement(user.id)) return json({ alreadyPaid: true }, 200, cors);
 
     const site = env('SITE_URL').replace(/\/$/, '');
-    const cents = Number(envOr('COURSE_PRICE_CHF_CENTS', '2900'));
+    const cents = Number(envOr('COURSE_PRICE_CHF_CENTS', '1500'));
     if (!Number.isInteger(cents) || cents < 50) throw new Error('COURSE_PRICE_CHF_CENTS must be a whole number of rappen');
 
     const form = new URLSearchParams();
