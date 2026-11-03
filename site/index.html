@@ -251,6 +251,7 @@ function friendly(err){
 
 /* ---------- session + access ---------- */
 async function loadPaid(){
+ if(CFG.FREE_ACCESS===true)return true; /* paywall switched off: any signed-in account gets in */
  var r=await sb.from('entitlements').select('plan').maybeSingle();
  if(r.error){console.error(r.error);return false}
  return !!r.data;
