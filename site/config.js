@@ -4,5 +4,7 @@ window.HEC_CONFIG = {
   SUPABASE_URL: 'https://ydskynnlzmrdumipsgpp.supabase.co',
   SUPABASE_ANON_KEY: 'sb_publishable_OasdnWFKFJ-f0Tf9xjAqZg_2J22dzG3',
   // Shown on the pay button. The real amount is COURSE_PRICE_CHF_CENTS in the Supabase function secrets.
+  // true = paywall OFF (everyone signed in can open the courses). Set to false to charge again.
+  FREE_ACCESS: true,
   PRICE_LABEL: 'CHF 15'
 };
