@@ -1,0 +1,12 @@
+project_id = "hecwebsite"
+
+# These functions check the caller themselves (Supabase Auth for the browser,
+# the Stripe signature for the webhook), so the gateway's JWT check is off.
+[functions.create-checkout]
+verify_jwt = false
+
+[functions.course]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
