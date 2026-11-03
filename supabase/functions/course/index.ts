@@ -2,6 +2,10 @@
 // Returns the course page only to a signed-in account that has paid.
 import { COURSES, corsHeaders, downloadCourse, getUser, hasEntitlement, json } from '../_shared/lib.ts';
 
+function Deno_env(k: string): string | undefined {
+  return ((globalThis as any).Deno?.env?.get(k)) ?? (globalThis as any).process?.env?.[k];
+}
+
 export async function handle(req: Request): Promise<Response> {
   const cors = corsHeaders(req);
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
@@ -14,7 +18,9 @@ export async function handle(req: Request): Promise<Response> {
   if (!user) return json({ error: 'not_signed_in' }, 401, cors);
 
   try {
-    if (!(await hasEntitlement(user.id))) return json({ error: 'payment_required' }, 402, cors);
+    // FREE_ACCESS=true (function secret) switches the paywall off; any signed-in account may read.
+    const free = (Deno_env('FREE_ACCESS') ?? '') === 'true';
+    if (!free && !(await hasEntitlement(user.id))) return json({ error: 'payment_required' }, 402, cors);
 
     const file = await downloadCourse(slug);
     if (!file.ok || !file.body) {
