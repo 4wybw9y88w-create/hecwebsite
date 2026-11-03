@@ -1,0 +1,9 @@
+# The paid course pages and all secrets must never reach GitHub.
+private/
+backup/
+.env
+.env.*
+!.env.example
+node_modules/
+supabase/.temp/
+.DS_Store
