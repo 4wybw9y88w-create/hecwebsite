@@ -40,10 +40,10 @@ supabase secrets set \
   SITE_URL=https://YOUR-USER.github.io/YOUR-REPO \
   STRIPE_SECRET_KEY=sk_test_... \
   STRIPE_WEBHOOK_SECRET=whsec_... \
-  COURSE_PRICE_CHF_CENTS=2900
+  COURSE_PRICE_CHF_CENTS=1500
 supabase functions deploy create-checkout stripe-webhook course
 ```
-`COURSE_PRICE_CHF_CENTS` is the price in rappen (2900 = CHF 29.00). Change it here and in `site/config.js` (`PRICE_LABEL`, the text on the button).
+`COURSE_PRICE_CHF_CENTS` is the price in rappen (1500 = CHF 15.00). Change it here and in `site/config.js` (`PRICE_LABEL`, the text on the button).
 
 ### 4. Put the course pages in private storage
 ```bash
