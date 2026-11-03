@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>HEC BSc1 Study Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;600;700&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap">
+<style>
+/* Layout: sign-in wall until a session exists; then the course grid, locked behind a one-time TWINT payment until the account is paid. */
+:root{
+ color-scheme:light;
+ --bg:#f6f2ea;--bg2:#efe9dc;--card:#fffdf8;--fg:#1f2430;--fg2:#4a5163;--fg3:#7b8191;--line:#ddd5c3;
+ --acc:#1f5f7a;--acc2:#154659;--accbg:#e1eef3;--ochre:#b7791f;--green:#2f7d4f;--herofrom:#154659;--heroto:#1f5f7a;
+ --err:#a4262c;--errbg:#fbe9ea;--info:#154659;--infobg:#e1eef3;--field:#fff;--onacc:#f6f2ea;
+ --shadow:0 1px 2px rgba(60,50,30,.08),0 6px 18px rgba(60,50,30,.06);
+ --serif:'Fraunces',Georgia,'Times New Roman',serif;--sans:'Source Sans 3','Segoe UI',system-ui,-apple-system,sans-serif;--math:'STIX Two Text','Cambria Math','Times New Roman',serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --bg:#14181f;--bg2:#1a1f28;--card:#1c222c;--fg:#e8e6df;--fg2:#b6b9c4;--fg3:#868b99;--line:#2d3542;
+ --acc:#6cb8d4;--acc2:#8fcde3;--accbg:#173340;--ochre:#e2b25c;--green:#7ccb9a;--herofrom:#17445a;--heroto:#1f6f8e;
+ --err:#f0a0a4;--errbg:#3a1c1f;--info:#8fcde3;--infobg:#173340;--field:#12161d;--onacc:#14181f;
+ --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.25);color-scheme:dark}}
+:root[data-theme="dark"]{
+ --bg:#14181f;--bg2:#1a1f28;--card:#1c222c;--fg:#e8e6df;--fg2:#b6b9c4;--fg3:#868b99;--line:#2d3542;
+ --acc:#6cb8d4;--acc2:#8fcde3;--accbg:#173340;--ochre:#e2b25c;--green:#7ccb9a;--herofrom:#17445a;--heroto:#1f6f8e;
+ --err:#f0a0a4;--errbg:#3a1c1f;--info:#8fcde3;--infobg:#173340;--field:#12161d;--onacc:#14181f;
+ --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.25);color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.65 var(--sans);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+[hidden]{display:none!important}
+h1,h2,h3{font-family:var(--serif);line-height:1.2;text-wrap:balance;margin:0}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.wrap{max-width:1180px;margin:0 auto}
+.top{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:10px max(16px,env(safe-area-inset-left,0px))}
+.top .wrap{display:flex;align-items:center;gap:12px}
+.brand{font:700 20px/1 var(--serif);letter-spacing:-.01em;display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand i{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--acc);color:var(--onacc);font:italic 700 17px var(--serif)}
+.themebtn{border:1px solid var(--line);background:var(--card);border-radius:10px;width:36px;height:36px}
+.who{display:flex;align-items:center;gap:10px;min-width:0}
+.who span{font-weight:600;color:var(--fg2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:24ch}
+.ghost{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:6px 14px;font-weight:600;font-size:15px}
+.ghost:hover{border-color:var(--acc)}
+main{padding-block:26px 70px}
+
+/* sign-in wall */
+.gate{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:stretch}
+.panel{background:linear-gradient(135deg,var(--herofrom),var(--heroto));color:#fff;border-radius:20px;padding:34px 34px 30px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:18px;min-width:0}
+.panel h1{font-size:clamp(30px,4.6vw,44px)}
+.panel p{margin:0;color:#e9f3f7;font-size:18px;max-width:46ch}
+.panel svg{position:absolute;right:-14px;bottom:-26px;width:250px;opacity:.16}
+.facts{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:auto;padding-top:18px;border-top:1px solid rgba(255,255,255,.28);position:relative}
+.facts div{display:flex;flex-direction:column;line-height:1.2}
+.facts b{font:700 28px var(--serif);font-variant-numeric:tabular-nums}
+.facts span{font-size:13.5px;color:#d3e6ee}
+.formcard{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:26px 28px 28px;min-width:0;align-self:center}
+.eyebrow{font:700 12px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--ochre);margin:0 0 12px}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;margin-bottom:20px}
+.seg button{border:0;background:none;border-radius:9px;padding:8px 10px;font-weight:700;color:var(--fg2)}
+.seg button[aria-selected="true"]{background:var(--card);color:var(--acc);box-shadow:var(--shadow)}
+form{display:flex;flex-direction:column;gap:14px}
+label{display:flex;flex-direction:column;gap:5px;font-weight:600;font-size:15px;color:var(--fg2)}
+input{background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px;color:var(--fg);width:100%;min-width:0}
+input:focus{border-color:var(--acc)}
+.hint{font-weight:400;font-size:13.5px;color:var(--fg3)}
+.msg{background:var(--errbg);color:var(--err);border-radius:10px;padding:9px 12px;font-size:15px;font-weight:600}
+.msg.info{background:var(--infobg);color:var(--info)}
+.primary{border:0;background:var(--acc);color:var(--onacc);border-radius:12px;padding:12px 18px;font-weight:700;font-size:17px}
+.primary:hover{background:var(--acc2)}
+.primary[disabled]{opacity:.6;cursor:progress}
+.switch{margin:16px 0 0;font-size:15px;color:var(--fg3)}
+.switch button{border:0;background:none;padding:0;color:var(--acc);font-weight:700;text-decoration:underline}
+
+/* payment */
+.pay{display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:24px 28px;margin-bottom:28px}
+.pay h2{font-size:clamp(22px,3.2vw,28px)}
+.pay p{margin:8px 0 0;color:var(--fg2);max-width:52ch}
+.paybox{display:flex;flex-direction:column;gap:10px;align-items:stretch;min-width:230px}
+.price{font:700 34px/1 var(--serif);font-variant-numeric:tabular-nums}
+.price small{display:block;font:600 13.5px var(--sans);color:var(--fg3);margin-top:4px}
+.paying{display:flex;align-items:center;gap:12px}
+
+/* hub */
+.hero{background:linear-gradient(135deg,var(--herofrom),var(--heroto));color:#fff;border-radius:20px;padding:28px 30px;margin-bottom:28px;position:relative;overflow:hidden}
+.hero h1{font-size:clamp(28px,5vw,42px)}
+.hero p{max-width:60ch;margin:10px 0 0;color:#e9f3f7;font-size:18px}
+.hero svg{position:absolute;right:-10px;bottom:-24px;width:260px;opacity:.18}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.course{display:flex;flex-direction:column;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--shadow);text-decoration:none;color:var(--fg);transition:border-color .2s,transform .2s;min-width:0}
+a.course:hover{border-color:var(--acc);transform:translateY(-2px)}
+.course.locked{opacity:.72;box-shadow:none}
+.course header{display:flex;align-items:center;gap:12px}
+.glyph{flex:none;display:grid;place-items:center;width:46px;height:46px;border-radius:12px;background:var(--acc);color:var(--onacc);font:italic 700 24px var(--math)}
+.course.locked .glyph{background:var(--line);color:var(--fg2)}
+.course h2{font-size:23px}
+.course p{margin:0;color:var(--fg2);font-size:15.5px;line-height:1.5}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs span{font:600 12.5px var(--sans);color:var(--acc2);background:var(--accbg);border-radius:99px;padding:2px 10px}
+.prog{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--fg3);margin-top:auto;padding-top:10px;border-top:1px dashed var(--line);font-variant-numeric:tabular-nums}
+.bar{flex:1;height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar b{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--green));border-radius:99px}
+.open{font-weight:700;color:var(--acc)}
+.course.locked .open{color:var(--fg3);display:inline-flex;align-items:center;gap:6px}
+.note{margin-top:22px;font-size:14px;color:var(--fg3);max-width:70ch}
+@media(max-width:820px){.gate{grid-template-columns:minmax(0,1fr)}.panel{padding:26px 22px 24px}.formcard{align-self:stretch}.pay{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:560px){.hero{padding:22px 20px}.grid{grid-template-columns:minmax(0,1fr)}.who span{display:none}.formcard{padding:22px 18px 24px}.pay{padding:20px 18px}}
+@media(prefers-reduced-motion:reduce){.course{transition:none}a.course:hover{transform:none}}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="wrap">
+ <div class="brand"><i>H</i>HEC BSc1</div>
+ <div class="who" id="who" hidden><span id="whoname"></span><button class="ghost" id="signout" type="button">Sign out</button></div>
+ <button class="themebtn" id="themebtn" type="button" aria-label="Toggle light / dark theme">◐</button>
+</div></div>
+
+<main class="wrap">
+ <!-- shown only while nobody is signed in -->
+ <section class="gate" id="gate" aria-label="Sign in" hidden>
+  <div class="panel">
+   <h1>Your first year at HEC, one account.</h1>
+   <p>Notes, step-by-step exercises, flashcards and timed past papers for all six courses. Create an account or log in to continue.</p>
+   <div class="facts">
+    <div><b>6</b><span>courses</span></div>
+    <div><b>678</b><span>sections</span></div>
+    <div><b>157</b><span>accounting flashcards</span></div>
+    <div><b>3</b><span>mock exams</span></div>
+   </div>
+   <svg viewBox="0 0 200 200" aria-hidden="true"><path d="M30 60 L100 30 L170 60 L100 90 Z" stroke="#fff" stroke-width="7" fill="none" stroke-linejoin="round"/><path d="M60 75 V120 C60 140 140 140 140 120 V75 M170 60 V110" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round"/></svg>
+  </div>
+  <div class="formcard">
+   <p class="eyebrow" id="formeyebrow">Welcome back</p>
+   <div class="seg" role="tablist" aria-label="Account">
+    <button type="button" role="tab" id="tab-in" aria-selected="true" aria-controls="form-in">Log in</button>
+    <button type="button" role="tab" id="tab-up" aria-selected="false" aria-controls="form-up">Sign up</button>
+   </div>
+   <div class="msg" id="setup-msg" role="alert" hidden>The backend is not connected yet. Fill in site/config.js with your Supabase project URL and anon key.</div>
+
+   <form id="form-in" novalidate aria-labelledby="tab-in">
+    <label for="in-email">Email
+     <input id="in-email" type="email" autocomplete="email" inputmode="email" required>
+    </label>
+    <label for="in-pass">Password
+     <input id="in-pass" type="password" autocomplete="current-password" required>
+    </label>
+    <div class="msg" id="in-msg" role="alert" hidden></div>
+    <button class="primary" type="submit" id="in-go">Log in</button>
+    <p class="switch">New here? <button type="button" data-go="up">Create an account</button></p>
+   </form>
+
+   <form id="form-up" novalidate hidden aria-labelledby="tab-up">
+    <label for="up-name">First name
+     <input id="up-name" type="text" autocomplete="given-name" required>
+    </label>
+    <label for="up-email">Email
+     <input id="up-email" type="email" autocomplete="email" inputmode="email" required>
+    </label>
+    <label for="up-pass">Password
+     <input id="up-pass" type="password" autocomplete="new-password" minlength="8" required>
+     <span class="hint">At least 8 characters.</span>
+    </label>
+    <label for="up-pass2">Repeat password
+     <input id="up-pass2" type="password" autocomplete="new-password" required>
+    </label>
+    <div class="msg" id="up-msg" role="alert" hidden></div>
+    <button class="primary" type="submit" id="up-go">Create account</button>
+    <p class="switch">Already registered? <button type="button" data-go="in">Log in</button></p>
+   </form>
+  </div>
+ </section>
+
+ <!-- signed in -->
+ <section id="hub" hidden>
+  <div class="hero">
+   <h1 id="hello">HEC Lausanne, first year</h1>
+   <p>All six course summaries in one place. Each one has notes, step-by-step exercises and a progress tracker; most add flashcards, mini tests and timed past papers.</p>
+   <svg viewBox="0 0 200 200" aria-hidden="true"><path d="M30 60 L100 30 L170 60 L100 90 Z" stroke="#fff" stroke-width="7" fill="none" stroke-linejoin="round"/><path d="M60 75 V120 C60 140 140 140 140 120 V75 M170 60 V110" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round"/></svg>
+  </div>
+
+  <section class="pay" id="pay" aria-label="Unlock the courses" hidden>
+   <div>
+    <p class="eyebrow">Unlock the courses</p>
+    <h2>One payment opens all six courses</h2>
+    <p>Pay once with TWINT or card. Your courses open as soon as the payment goes through, on every device you log in from.</p>
+   </div>
+   <div class="paybox">
+    <div class="price"><span id="price">CHF 29</span><small>one-time, no subscription</small></div>
+    <button class="primary" type="button" id="paybtn">Pay with TWINT</button>
+    <div class="msg" id="pay-msg" role="alert" hidden></div>
+   </div>
+  </section>
+
+  <section class="pay" id="confirming" aria-live="polite" hidden>
+   <div>
+    <p class="eyebrow">Payment</p>
+    <h2>Confirming your payment…</h2>
+    <p id="confirming-text">This usually takes a few seconds. The courses unlock on their own.</p>
+   </div>
+  </section>
+
+  <p class="eyebrow">Courses</p>
+  <div class="grid" id="grid"></div>
+  <p class="note" id="gridnote">Progress bars show the sections you marked “Got it” on this device.</p>
+ </section>
+</main>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+'use strict';
+var CFG=window.HEC_CONFIG||{};
+var CONFIGURED=/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(CFG.SUPABASE_URL||'')&&!!CFG.SUPABASE_ANON_KEY&&CFG.SUPABASE_ANON_KEY.indexOf('YOUR-')!==0&&(CFG.SUPABASE_URL||'').indexOf('YOUR-')<0;
+var FN=(CFG.SUPABASE_URL||'')+'/functions/v1';
+function $(id){return document.getElementById(id)}
+
+var COURSES=[
+ {slug:'statistics',name:'Statistics I',glyph:'σ',key:'stat2.v1',sections:89,blurb:'Describing data, probability, random variables, estimation and tests, with a worked calculation for every formula.',tabs:['Notes','Exercises','Flashcards','Mini test','Past papers']},
+ {slug:'mathematics',name:'Mathematics I',glyph:'∫',key:'math1.v1',sections:82,blurb:'Financial mathematics, functions, derivatives and integrals, rebuilt one small step at a time.',tabs:['Notes','Exercises']},
+ {slug:'economics',name:'Economics I',glyph:'μ',key:'eco1.v3',sections:61,blurb:'Consumer and producer theory, market equilibrium and taxes, with a figure wherever a picture helps.',tabs:['Notes','Exercises','Past papers']},
+ {slug:'financial-accounting',name:'Financial Accounting',glyph:'Σ',key:'fa2.v1',sections:188,blurb:'38 chapters in 6 parts, 56 exercises with solutions, 157 flashcards and three mock exams.',tabs:['Notes','Exercises','Exams','Study tools']},
+ {slug:'computer-models',name:'Computer Models I',glyph:'≡',key:'mi.v1',sections:163,blurb:'Excel calculation models, relational databases, SQL, normalization, UML and data warehouses.',tabs:['Notes','SQL blueprints','Exercises','Past papers','SQL lab','Flashcards','Mini test']},
+ {slug:'management-ethics',name:'Management and Ethics',glyph:'M',key:'mgmt2.v1',sections:95,blurb:'Ethics and society, CSR and innovation, strategy, and the functions of the organization.',tabs:['Notes','Exercises','Flashcards','Mini test','Past papers']}
+];
+var LOCK='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+
+var sb=null;
+if(CONFIGURED&&window.supabase){
+ sb=window.supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+}
+var state={user:null,paid:false,confirming:false,ready:false};
+
+/* ---------- helpers ---------- */
+function got(key){try{var s=JSON.parse(localStorage.getItem(key)||'{}');var g=s.got||{};return Object.keys(g).filter(function(k){return g[k]}).length}catch(e){return 0}}
+function say(id,text,info){var m=$(id);m.textContent=text;m.classList.toggle('info',!!info);m.hidden=false}
+function clear(id){$(id).hidden=true}
+function friendly(err){
+ var t=(err&&err.message||'').toLowerCase();
+ if(t.indexOf('invalid login')>=0)return 'Email or password is incorrect.';
+ if(t.indexOf('already registered')>=0||t.indexOf('already been registered')>=0)return 'An account with this email already exists. Log in instead.';
+ if(t.indexOf('email not confirmed')>=0)return 'Confirm your email first: open the link we sent you, then log in.';
+ if(t.indexOf('rate limit')>=0||t.indexOf('too many')>=0)return 'Too many attempts. Wait a minute and try again.';
+ if(t.indexOf('password')>=0&&t.indexOf('weak')>=0)return 'Choose a stronger password.';
+ if(t.indexOf('failed to fetch')>=0||t.indexOf('network')>=0)return 'Cannot reach the server. Check your connection and try again.';
+ return 'Something went wrong. Try again.';
+}
+
+/* ---------- session + access ---------- */
+async function loadPaid(){
+ var r=await sb.from('entitlements').select('plan').maybeSingle();
+ if(r.error){console.error(r.error);return false}
+ return !!r.data;
+}
+async function refresh(){
+ var s=(await sb.auth.getSession()).data.session;
+ if(!s){state.user=null;state.paid=false;state.ready=true;render();return}
+ var u=s.user;
+ state.user={id:u.id,email:u.email,name:(u.user_metadata&&u.user_metadata.full_name)||String(u.email||'').split('@')[0]};
+ state.paid=await loadPaid();
+ state.ready=true;
+ render();
+}
+
+/* ---------- render ---------- */
+function buildGrid(open){
+ var grid=$('grid');grid.textContent='';
+ COURSES.forEach(function(c){
+  var n=open?got(c.key):0,pct=Math.min(100,Math.round(100*n/c.sections));
+  var el=document.createElement(open?'a':'div');el.className='course'+(open?'':' locked');
+  if(open)el.href='course.html?c='+c.slug;else el.setAttribute('aria-disabled','true');
+  el.innerHTML='<header><span class="glyph"></span><h2></h2></header><p></p><div class="tabs"></div>'+
+   '<div class="prog">'+(open?'<span class="pc"></span><div class="bar"><b></b></div><span class="open">Open →</span>':'<span class="open">'+LOCK+'Unlocks after payment</span>')+'</div>';
+  el.querySelector('.glyph').textContent=c.glyph;el.querySelector('h2').textContent=c.name;el.querySelector('p').textContent=c.blurb;
+  c.tabs.forEach(function(t){var s=document.createElement('span');s.textContent=t;el.querySelector('.tabs').appendChild(s)});
+  if(open){el.querySelector('.pc').textContent=pct+'%';el.querySelector('.bar b').style.width=pct+'%'}
+  grid.appendChild(el);
+ });
+}
+function render(){
+ var signed=!!state.user;
+ $('gate').hidden=signed||!state.ready&&CONFIGURED;
+ $('hub').hidden=!signed;$('who').hidden=!signed;
+ $('setup-msg').hidden=CONFIGURED;
+ if(!signed){$('grid').textContent='';return}
+ $('whoname').textContent=state.user.name;
+ $('hello').textContent=state.paid?'Welcome back, '+state.user.name:'Welcome, '+state.user.name;
+ $('price').textContent=CFG.PRICE_LABEL||'';
+ $('pay').hidden=state.paid||state.confirming;
+ $('confirming').hidden=!state.confirming||state.paid;
+ $('gridnote').hidden=!state.paid;
+ buildGrid(state.paid);
+}
+
+/* ---------- gate UI ---------- */
+function show(which){
+ var up=which==='up';
+ $('form-in').hidden=up;$('form-up').hidden=!up;
+ $('tab-in').setAttribute('aria-selected',String(!up));$('tab-up').setAttribute('aria-selected',String(up));
+ $('formeyebrow').textContent=up?'Create your account':'Welcome back';
+ clear('in-msg');clear('up-msg');
+}
+$('tab-in').addEventListener('click',function(){show('in')});
+$('tab-up').addEventListener('click',function(){show('up')});
+document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){var w=b.getAttribute('data-go');show(w);$(w==='up'?'up-name':'in-email').focus()})});
+var EMAIL=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+$('form-in').addEventListener('submit',async function(ev){
+ ev.preventDefault();clear('in-msg');
+ if(!sb)return say('in-msg','The backend is not connected yet.');
+ var email=$('in-email').value.trim(),pw=$('in-pass').value;
+ if(!EMAIL.test(email))return say('in-msg','Enter a valid email address.');
+ if(!pw)return say('in-msg','Enter your password.');
+ $('in-go').disabled=true;
+ var r=await sb.auth.signInWithPassword({email:email,password:pw});
+ $('in-go').disabled=false;
+ if(r.error)return say('in-msg',friendly(r.error));
+ $('in-pass').value='';
+});
+$('form-up').addEventListener('submit',async function(ev){
+ ev.preventDefault();clear('up-msg');
+ if(!sb)return say('up-msg','The backend is not connected yet.');
+ var name=$('up-name').value.trim(),email=$('up-email').value.trim(),pw=$('up-pass').value,pw2=$('up-pass2').value;
+ if(!name)return say('up-msg','Enter your first name.');
+ if(!EMAIL.test(email))return say('up-msg','Enter a valid email address.');
+ if(pw.length<8)return say('up-msg','Choose a password with at least 8 characters.');
+ if(pw!==pw2)return say('up-msg','The two passwords do not match.');
+ $('up-go').disabled=true;
+ var r=await sb.auth.signUp({email:email,password:pw,options:{data:{full_name:name},emailRedirectTo:location.origin+location.pathname}});
+ $('up-go').disabled=false;
+ if(r.error)return say('up-msg',friendly(r.error));
+ $('up-pass').value='';$('up-pass2').value='';
+ if(!r.data.session){ // email confirmation is switched on
+  show('in');$('in-email').value=email;
+  say('in-msg','Almost done: we sent a confirmation link to '+email+'. Open it, then log in here.',true);
+ }
+});
+$('signout').addEventListener('click',async function(){if(sb)await sb.auth.signOut();state.user=null;state.paid=false;show('in');render();window.scrollTo(0,0)});
+
+/* ---------- payment ---------- */
+$('paybtn').addEventListener('click',async function(){
+ clear('pay-msg');
+ var btn=$('paybtn');btn.disabled=true;
+ try{
+  var s=(await sb.auth.getSession()).data.session;
+  if(!s)throw new Error('signed out');
+  var r=await fetch(FN+'/create-checkout',{method:'POST',headers:{Authorization:'Bearer '+s.access_token,apikey:CFG.SUPABASE_ANON_KEY,'Content-Type':'application/json'}});
+  var d=await r.json().catch(function(){return {}});
+  if(d.alreadyPaid){await refresh();btn.disabled=false;return}
+  if(!r.ok||!d.url)throw new Error('checkout');
+  location.href=d.url; // leaves for Stripe; button stays disabled
+ }catch(e){
+  btn.disabled=false;
+  say('pay-msg','Could not start the payment. Try again in a moment.');
+ }
+});
+async function waitForPayment(){
+ state.confirming=true;render();
+ for(var i=0;i<20;i++){
+  state.paid=await loadPaid();
+  if(state.paid)break;
+  await new Promise(function(res){setTimeout(res,2000)});
+ }
+ state.confirming=false;
+ if(!state.paid){
+  render();
+  say('pay-msg','We have not received the payment yet. If you paid, wait a minute and reload this page. Nothing is charged twice.',true);
+ }else{render()}
+}
+
+/* ---------- theme + start ---------- */
+$('themebtn').addEventListener('click',function(){
+ var r=document.documentElement,cur=r.getAttribute('data-theme');
+ var dark=cur?cur==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+ r.setAttribute('data-theme',dark?'light':'dark');
+});
+
+async function start(){
+ if(!sb){state.ready=true;$('gate').hidden=false;$('setup-msg').hidden=CONFIGURED;
+  if(CONFIGURED){$('setup-msg').textContent='Could not load the sign-in service. Check your connection and reload.';$('setup-msg').hidden=false}
+  return}
+ await refresh();
+ var q=new URLSearchParams(location.search);
+ if(q.get('paid')==='1'||q.get('canceled')==='1'||q.get('needpay')==='1'){
+  history.replaceState(null,'',location.pathname);
+  if(state.user&&!state.paid){
+   if(q.get('paid')==='1')await waitForPayment();
+   else if(q.get('canceled')==='1')say('pay-msg','The payment was cancelled. You have not been charged.',true);
+  }
+ }
+ var last=state.user&&state.user.id;
+ sb.auth.onAuthStateChange(function(ev,session){
+  var id=session&&session.user&&session.user.id||null;
+  if(id!==last||ev==='SIGNED_OUT'){last=id;setTimeout(refresh,0)} // never await Supabase calls inside this callback
+ });
+}
+start();
+})();
+</script>
+</body>
+</html>

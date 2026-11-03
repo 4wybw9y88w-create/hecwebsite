@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Opening course</title>
+<style>
+:root{color-scheme:light;--bg:#f6f2ea;--fg:#1f2430;--fg2:#4a5163;--acc:#1f5f7a;--line:#ddd5c3;--card:#fffdf8;--err:#a4262c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14181f;--fg:#e8e6df;--fg2:#b6b9c4;--acc:#6cb8d4;--line:#2d3542;--card:#1c222c;--err:#f0a0a4;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14181f;--fg:#e8e6df;--fg2:#b6b9c4;--acc:#6cb8d4;--line:#2d3542;--card:#1c222c;--err:#f0a0a4;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--fg);font:17px/1.6 'Source Sans 3','Segoe UI',system-ui,-apple-system,sans-serif;padding:16px max(16px,env(safe-area-inset-left,0px))}
+.box{max-width:420px;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+.spin{width:26px;height:26px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--acc);animation:s 0.9s linear infinite}
+@keyframes s{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.spin{animation:none}}
+#msg{margin:0;color:var(--fg2)}
+#msg.err{color:var(--err);font-weight:600}
+a{color:var(--acc);font-weight:700}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="box">
+ <div class="spin" id="spin" aria-hidden="true"></div>
+ <p id="msg" role="status">Opening your course…</p>
+ <a id="back" href="index.html" hidden>Back to all courses</a>
+</div>
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+(async function(){
+ var CFG=window.HEC_CONFIG||{};
+ function fail(text){document.getElementById('spin').hidden=true;var m=document.getElementById('msg');m.textContent=text;m.className='err';document.getElementById('back').hidden=false}
+ var slug=new URLSearchParams(location.search).get('c')||'';
+ if(!/^[a-z-]{3,40}$/.test(slug))return fail('This course link is not valid.');
+ if(!window.supabase||!CFG.SUPABASE_URL)return fail('Could not load the sign-in service. Reload the page.');
+ try{
+  var sb=window.supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY);
+  var s=(await sb.auth.getSession()).data.session;
+  if(!s){location.replace('index.html');return}
+  var r=await fetch(CFG.SUPABASE_URL+'/functions/v1/course?c='+encodeURIComponent(slug),{headers:{Authorization:'Bearer '+s.access_token,apikey:CFG.SUPABASE_ANON_KEY}});
+  if(r.status===401){location.replace('index.html');return}
+  if(r.status===402){location.replace('index.html?needpay=1');return}
+  if(r.status===404)return fail('This course has not been uploaded yet.');
+  if(!r.ok)return fail('Could not open the course. Try again in a moment.');
+  var html=await r.text();
+  document.open();document.write(html);document.close(); // replaces this page with the course
+ }catch(e){fail('Could not open the course. Check your connection and try again.')}
+})();
+</script>
+</body>
+</html>
