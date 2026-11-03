@@ -129,7 +129,7 @@ test('checkout: builds a TWINT + card CHF session tied to the user', async () =>
   assert.equal(f.get('payment_method_types[0]'), 'twint');
   assert.equal(f.get('payment_method_types[1]'), 'card');
   assert.equal(f.get('line_items[0][price_data][currency]'), 'chf');
-  assert.equal(f.get('line_items[0][price_data][unit_amount]'), '2900');
+  assert.equal(f.get('line_items[0][price_data][unit_amount]'), '1500');
   assert.equal(f.get('client_reference_id'), FREE_USER);
   assert.equal(f.get('success_url'), 'https://niko.github.io/hecwebsite/?paid=1');
   assert.equal(f.get('cancel_url'), 'https://niko.github.io/hecwebsite/?canceled=1');
@@ -160,7 +160,7 @@ function signed(event, { secret = 'whsec_test', ts = Math.floor(Date.now() / 100
 }
 const session = (over = {}) => ({
   type: 'checkout.session.completed',
-  data: { object: { id: 'cs_test_1', client_reference_id: FREE_USER, payment_status: 'paid', payment_intent: 'pi_new', amount_total: 2900, currency: 'chf', ...over } },
+  data: { object: { id: 'cs_test_1', client_reference_id: FREE_USER, payment_status: 'paid', payment_intent: 'pi_new', amount_total: 1500, currency: 'chf', ...over } },
 });
 test('webhook: bad or missing signature -> 400 and nothing granted', async () => {
   reset();
@@ -180,7 +180,7 @@ test('webhook: paid session grants access', async () => {
   const row = entitlements.get(FREE_USER);
   assert.equal(row.stripe_session_id, 'cs_test_1');
   assert.equal(row.stripe_payment_intent, 'pi_new');
-  assert.equal(row.amount_total, 2900);
+  assert.equal(row.amount_total, 1500);
   // and the course now opens for that account
   entitlements.set(FREE_USER, row);
   assert.equal((await course(get('course?c=economics', 'tok-free'))).status, 200);
