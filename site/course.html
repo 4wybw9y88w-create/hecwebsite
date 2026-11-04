@@ -23,28 +23,34 @@ a{color:var(--acc);font-weight:700}
 <body>
 <div class="box">
  <div class="spin" id="spin" aria-hidden="true"></div>
- <p id="msg" role="status">Opening your course…</p>
- <a id="back" href="index.html" hidden>Back to all courses</a>
+ <p id="msg" role="status" data-i18n="c_opening">Opening your course…</p>
+ <a id="back" href="index.html" hidden data-i18n="c_back">Back to all courses</a>
 </div>
+<script src="i18n.js"></script>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 (async function(){
  var CFG=window.HEC_CONFIG||{};
+ var I=window.HEC_I18N,t=I.t;I.apply();
  function fail(text){document.getElementById('spin').hidden=true;var m=document.getElementById('msg');m.textContent=text;m.className='err';document.getElementById('back').hidden=false}
  var slug=new URLSearchParams(location.search).get('c')||'';
- if(!/^[a-z-]{3,40}$/.test(slug))return fail('This course link is not valid.');
- if(!window.supabase||!CFG.SUPABASE_URL)return fail('Could not load the sign-in service. Reload the page.');
+ if(!/^[a-z-]{3,40}$/.test(slug))return fail(t('c_invalid'));
+ if(!window.supabase||!CFG.SUPABASE_URL)return fail(t('c_noauth'));
  try{
   var sb=window.supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY);
   var s=(await sb.auth.getSession()).data.session;
   if(!s){location.replace('index.html');return}
-  var r=await fetch(CFG.SUPABASE_URL+'/functions/v1/course?c='+encodeURIComponent(slug),{headers:{Authorization:'Bearer '+s.access_token,apikey:CFG.SUPABASE_ANON_KEY}});
+  var r=await fetch(CFG.SUPABASE_URL+'/functions/v1/course?c='+encodeURIComponent(slug)+(I.lang!=='en'?'&lang='+I.lang:''),{headers:{Authorization:'Bearer '+s.access_token,apikey:CFG.SUPABASE_ANON_KEY}});
   if(r.status===401){location.replace('index.html');return}
   if(r.status===402){location.replace('index.html?needpay=1');return}
-  if(r.status===404)return fail('This course has not been uploaded yet.');
-  if(!r.ok)return fail('Could not open the course. Try again in a moment.');
+  if(r.status===404)return fail(t('c_missing'));
+  if(!r.ok)return fail(t('c_fail'));
   var html=await r.text();
+  var served=r.headers.get('x-course-lang')||'en';
+  var snippet='<style>#hec-lang{position:fixed;right:12px;bottom:12px;z-index:99999;display:flex;flex-direction:column;align-items:flex-end;gap:6px;font:600 12.5px system-ui,sans-serif}#hec-lang .row{display:inline-flex;border:1px solid #c9c0ab;border-radius:10px;overflow:hidden;background:#fffdf8;box-shadow:0 2px 8px rgba(0,0,0,.18)}#hec-lang button{border:0;background:none;color:#1f2430;font:inherit;font-weight:700;padding:6px 9px;cursor:pointer}#hec-lang button[aria-pressed=true]{background:#1f5f7a;color:#fff}#hec-lang .note{background:#fff3c4;color:#3a3200;border-radius:8px;padding:6px 10px;max-width:260px;box-shadow:0 2px 8px rgba(0,0,0,.18)}</style>'+
+   '<div id="hec-lang" role="group" aria-label="'+t('language')+'"></div><script>(function(){var L='+JSON.stringify(I.langs)+',cur='+JSON.stringify(I.lang)+',served='+JSON.stringify(served)+',note='+JSON.stringify(I.lang!==served?t('c_fallback',I.name(I.lang)):'')+';var box=document.getElementById("hec-lang");if(note){var n=document.createElement("div");n.className="note";n.textContent=note;box.appendChild(n)}var row=document.createElement("div");row.className="row";L.forEach(function(l){var b=document.createElement("button");b.type="button";b.textContent=l[1];b.title=l[2];b.setAttribute("aria-pressed",String(l[0]===cur));b.onclick=function(){try{localStorage.setItem("hec_lang",l[0])}catch(e){}location.reload()};row.appendChild(b)});box.appendChild(row)})()<\/script>';
+  html=/<\/body>\s*<\/html>\s*$/i.test(html)?html.replace(/<\/body>\s*<\/html>\s*$/i,snippet+'$&'):html+snippet;
   // Progress sync: the course pages save to window.claude's "db"/"user" when it exists. Here it is backed by this account's own rows.
   var uid=s.user.id;
   try{ if(localStorage.getItem('hec_uid')!==uid){ // another account used this browser: don't mix progress
@@ -61,7 +67,7 @@ a{color:var(--acc);font-weight:700}
         set:function(o){return sb.from('progress').upsert({user_id:uid,key:key,state:String(o.state),updated:o.updated||Date.now()}).then(function(x){if(x.error)throw x.error})}
       }}})}};
   document.open();document.write(html);document.close(); // replaces this page with the course
- }catch(e){fail('Could not open the course. Check your connection and try again.')}
+ }catch(e){fail(t('c_net'))}
 })();
 </script>
 </body>
