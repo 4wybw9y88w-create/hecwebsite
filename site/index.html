@@ -88,6 +88,7 @@ input:focus{border-color:var(--acc)}
 .hero h1{font-size:clamp(28px,5vw,42px)}
 .hero p{max-width:60ch;margin:10px 0 0;color:#e9f3f7;font-size:18px}
 .hero svg{position:absolute;right:-10px;bottom:-24px;width:260px;opacity:.18}
+.semh{grid-column:1/-1;margin:26px 0 2px;padding-top:14px;border-top:1.5px solid var(--line);font-size:26px}.semh:first-child{margin-top:4px;border-top:0;padding-top:0}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
 .course{display:flex;flex-direction:column;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--shadow);text-decoration:none;color:var(--fg);transition:border-color .2s,transform .2s;min-width:0}
 a.course:hover{border-color:var(--acc);transform:translateY(-2px)}
@@ -283,7 +284,8 @@ async function refresh(){
 /* ---------- render ---------- */
 function buildGrid(open){
  var grid=$('grid');grid.textContent='';
- COURSES.forEach(function(c){
+ COURSES.forEach(function(c,ci){
+  if(ci===0||ci===6){var sh=document.createElement('h2');sh.className='semh';sh.textContent=t(ci?'sem2':'sem1');grid.appendChild(sh)}
   var n=open?got(c.key):0,pct=Math.min(100,Math.round(100*n/c.sections));
   var el=document.createElement(open?'a':'div');el.className='course'+(open?'':' locked');
   if(open)el.href='course.html?c='+c.slug;else el.setAttribute('aria-disabled','true');

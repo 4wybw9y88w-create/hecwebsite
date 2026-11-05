@@ -2,7 +2,7 @@
    window.HEC_I18N = { lang, t(key, ...args), setLang(code), apply(), switcher() }
    The choice is remembered in localStorage ('hec_lang'). Course pages are served per language by the backend. */
 (function () {
-  var LANGS = [['en', 'EN', 'English'], ['fr', 'FR', 'Français'], ['de', 'DE', 'Deutsch'], ['it', 'IT', 'Italiano']];
+  var LANGS = [['en', 'EN', 'English'], ['fr', 'FR', 'Français']];
   var D = {
     en: {
       signout: 'Sign out', theme: 'Toggle light / dark theme', language: 'Language',
@@ -52,6 +52,7 @@
       'b:organisational-behavior': 'People, groups and leadership: ten lessons with the studies and numbers the exam asks about, 33 case exercises, flashcards, a mini test and the 2019, 2020 and 2021 papers.',
       'n:economics-two': 'Economics II',
       'b:economics-two': 'Markets, growth and the open economy: 14 topics, 37 step-by-step exercises, flashcards, a mini test and three practice papers.',
+      sem1: 'Semester 1', sem2: 'Semester 2',
       'n:droit-entreprise': "Business Law",
       'b:droit-entreprise': "The Swiss legal order and the law of obligations: 12 topics, 32 worked cases, flashcards, a mini test and three practice papers.",
       'Notes': 'Notes', 'Exercises': 'Exercises', 'Flashcards': 'Flashcards', 'Mini test': 'Mini test', 'Past papers': 'Past papers', 'Exams': 'Exams',
@@ -103,6 +104,7 @@
       'b:organisational-behavior': 'Personnes, groupes et leadership : dix leçons avec les études et les chiffres que l’examen demande, 33 exercices sur cas, des fiches, un mini-test et les examens de 2019, 2020 et 2021.',
       'n:economics-two': 'Économie II',
       'b:economics-two': 'Marchés, croissance et économie ouverte : 14 thèmes, 37 exercices pas à pas, des fiches, un mini-test et trois examens blancs.',
+      sem1: 'Semestre 1', sem2: 'Semestre 2',
       'n:droit-entreprise': "Droit de l’entreprise",
       'b:droit-entreprise': "L’ordre juridique suisse et le droit des obligations : 12 thèmes, 32 cas pratiques, des fiches, un mini-test et trois examens blancs.",
       'Notes': 'Notes', 'Exercises': 'Exercices', 'Flashcards': 'Flashcards', 'Mini test': 'Mini-test', 'Past papers': 'Anciens examens', 'Exams': 'Examens',
@@ -154,6 +156,7 @@
       'b:organisational-behavior': 'People, groups and leadership: ten lessons with the studies and numbers the exam asks about, 33 case exercises, flashcards, a mini test and the 2019, 2020 and 2021 papers.',
       'n:economics-two': 'Volkswirtschaftslehre II',
       'b:economics-two': 'Markets, growth and the open economy: 14 topics, 37 step-by-step exercises, flashcards, a mini test and three practice papers.',
+      sem1: 'Semester 1', sem2: 'Semester 2',
       'n:droit-entreprise': "Wirtschaftsrecht",
       'b:droit-entreprise': "The Swiss legal order and the law of obligations: 12 topics, 32 worked cases, flashcards, a mini test and three practice papers.",
       'Notes': 'Notizen', 'Exercises': 'Übungen', 'Flashcards': 'Lernkarten', 'Mini test': 'Mini-Test', 'Past papers': 'Alte Prüfungen', 'Exams': 'Prüfungen',
@@ -205,6 +208,7 @@
       'b:organisational-behavior': 'People, groups and leadership: ten lessons with the studies and numbers the exam asks about, 33 case exercises, flashcards, a mini test and the 2019, 2020 and 2021 papers.',
       'n:economics-two': 'Economia II',
       'b:economics-two': 'Markets, growth and the open economy: 14 topics, 37 step-by-step exercises, flashcards, a mini test and three practice papers.',
+      sem1: 'Semestre 1', sem2: 'Semestre 2',
       'n:droit-entreprise': "Diritto d’impresa",
       'b:droit-entreprise': "The Swiss legal order and the law of obligations: 12 topics, 32 worked cases, flashcards, a mini test and three practice papers.",
       'Notes': 'Appunti', 'Exercises': 'Esercizi', 'Flashcards': 'Flashcard', 'Mini test': 'Mini test', 'Past papers': 'Vecchi esami', 'Exams': 'Esami',
@@ -213,11 +217,12 @@
   };
 
   function stored() { try { return localStorage.getItem('hec_lang'); } catch (e) { return null; } }
+  function ok(c) { for (var i = 0; i < LANGS.length; i++) if (LANGS[i][0] === c) return true; return false; }
   function pick() {
     var s = stored();
-    if (s && D[s]) return s;
+    if (s && D[s] && ok(s)) return s;
     var n = ((navigator.languages && navigator.languages[0]) || navigator.language || 'en').slice(0, 2).toLowerCase();
-    return D[n] ? n : 'en';
+    return D[n] && ok(n) ? n : 'en';
   }
   var lang = pick();
   function t(key) {
