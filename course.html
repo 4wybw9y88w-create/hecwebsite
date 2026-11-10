@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Opening course</title>
 <style>
-:root{color-scheme:light;--bg:#f6f2ea;--fg:#1f2430;--fg2:#4a5163;--acc:#1f5f7a;--line:#ddd5c3;--card:#fffdf8;--err:#a4262c}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14181f;--fg:#e8e6df;--fg2:#b6b9c4;--acc:#6cb8d4;--line:#2d3542;--card:#1c222c;--err:#f0a0a4;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#14181f;--fg:#e8e6df;--fg2:#b6b9c4;--acc:#6cb8d4;--line:#2d3542;--card:#1c222c;--err:#f0a0a4;color-scheme:dark}
+:root{color-scheme:light;--bg:#f3efe2;--fg:#1d2a21;--fg2:#41503f;--acc:#2d6a43;--line:#d8d2bb;--card:#fbf9f1;--err:#a4262c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0b09;--fg:#f2efe0;--fg2:#c8c4aa;--acc:#f0c419;--line:#2e2c1c;--card:#171712;--err:#f0a0a4;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b0b09;--fg:#f2efe0;--fg2:#c8c4aa;--acc:#f0c419;--line:#2e2c1c;--card:#171712;--err:#f0a0a4;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--fg);font:17px/1.6 'Source Sans 3','Segoe UI',system-ui,-apple-system,sans-serif;padding:16px max(16px,env(safe-area-inset-left,0px))}
-.box{max-width:420px;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+.sk{position:fixed;inset:0 0 auto 0;height:64px;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 20px}.sk i,.sk b,.skb{display:block;border-radius:10px;background:linear-gradient(90deg,var(--line),var(--bg),var(--line));background-size:200% 100%;animation:sh 1.3s linear infinite}.sk i{width:110px;height:34px}.sk b{width:180px;height:30px}.sk b.t{flex:1;max-width:520px}.skb{position:fixed;left:50%;transform:translateX(-50%);top:96px;width:min(900px,92vw);height:150px;border-radius:22px}@keyframes sh{to{background-position:-200% 0}}.box{max-width:420px;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
 .spin{width:26px;height:26px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--acc);animation:s 0.9s linear infinite}
 @keyframes s{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.spin{animation:none}}
@@ -21,7 +21,8 @@ a{color:var(--acc);font-weight:700}
 </style>
 </head>
 <body>
-<div class="box">
+<div class="sk" aria-hidden="true"><i></i><b></b><b class="t"></b></div><div class="skb" aria-hidden="true"></div>
+<div class="box" style="margin-top:220px">
  <div class="spin" id="spin" aria-hidden="true"></div>
  <p id="msg" role="status" data-i18n="c_opening">Opening your course…</p>
  <a id="back" href="index.html" hidden data-i18n="c_back">Back to all courses</a>
@@ -48,8 +49,8 @@ a{color:var(--acc);font-weight:700}
   if(!r.ok)return fail(t('c_fail'));
   var html=await r.text();
   var served=r.headers.get('x-course-lang')||'en';
-  var snippet='<style>#hec-lang{position:fixed;right:12px;bottom:12px;z-index:99999;display:flex;flex-direction:column;align-items:flex-end;gap:6px;font:600 12.5px system-ui,sans-serif}#hec-lang .row{display:inline-flex;border:1px solid #c9c0ab;border-radius:10px;overflow:hidden;background:#fffdf8;box-shadow:0 2px 8px rgba(0,0,0,.18)}#hec-lang button{border:0;background:none;color:#1f2430;font:inherit;font-weight:700;padding:6px 9px;cursor:pointer}#hec-lang button[aria-pressed=true]{background:#1f5f7a;color:#fff}#hec-lang .note{background:#fff3c4;color:#3a3200;border-radius:8px;padding:6px 10px;max-width:260px;box-shadow:0 2px 8px rgba(0,0,0,.18)}</style>'+
-   '<div id="hec-lang" role="group" aria-label="'+t('language')+'"></div><script>(function(){var L='+JSON.stringify(I.langs)+',cur='+JSON.stringify(I.lang)+',served='+JSON.stringify(served)+',note='+JSON.stringify(I.lang!==served?t('c_fallback',I.name(I.lang)):'')+';var box=document.getElementById("hec-lang");if(note){var n=document.createElement("div");n.className="note";n.textContent=note;box.appendChild(n)}var row=document.createElement("div");row.className="row";L.forEach(function(l){var b=document.createElement("button");b.type="button";b.textContent=l[1];b.title=l[2];b.setAttribute("aria-pressed",String(l[0]===cur));b.onclick=function(){try{localStorage.setItem("hec_lang",l[0])}catch(e){}location.reload()};row.appendChild(b)});box.appendChild(row)})()<\/script>';
+  var snippet='<style>#hec-lang{position:fixed;right:12px;bottom:12px;z-index:99999;display:flex;flex-direction:column;align-items:flex-end;gap:6px;font:600 12.5px system-ui,sans-serif}#hec-lang.inh{position:static;flex:none;flex-direction:row;align-items:center}#hec-lang.inh .note{display:none}#hec-lang .row{display:inline-flex;border:1px solid var(--line,#d8d2bb);border-radius:10px;overflow:hidden;background:var(--card,#fbf9f1);box-shadow:none}#hec-lang button{border:0;background:none;color:var(--fg2,#41503f);font:inherit;font-weight:700;padding:6px 9px;cursor:pointer}#hec-lang button[aria-pressed=true]{background:var(--acc,#2d6a43);color:var(--card,#fff)}#hec-lang .note{background:#fff3c4;color:#3a3200;border-radius:8px;padding:6px 10px;max-width:260px;box-shadow:0 2px 8px rgba(0,0,0,.18)}</style>'+
+   '<div id="hec-lang" role="group" aria-label="'+t('language')+'"></div><script>(function(){var L='+JSON.stringify(I.langs)+',cur='+JSON.stringify(I.lang)+',served='+JSON.stringify(served)+',note='+JSON.stringify(I.lang!==served?t('c_fallback',I.name(I.lang)):'')+';var box=document.getElementById("hec-lang");if(note){var n=document.createElement("div");n.className="note";n.textContent=note;box.appendChild(n)}var row=document.createElement("div");row.className="row";L.forEach(function(l){var b=document.createElement("button");b.type="button";b.textContent=l[1];b.title=l[2];b.setAttribute("aria-pressed",String(l[0]===cur));b.onclick=function(){try{localStorage.setItem("hec_lang",l[0])}catch(e){}location.reload()};row.appendChild(b)});box.appendChild(row);var w=document.querySelector(".top .wrap");if(w){box.classList.add("inh");w.appendChild(box)}})()<\/script>';
   html=/<\/body>\s*<\/html>\s*$/i.test(html)?html.replace(/<\/body>\s*<\/html>\s*$/i,snippet+'$&'):html+snippet;
   // Progress sync: the course pages save to window.claude's "db"/"user" when it exists. Here it is backed by this account's own rows.
   var uid=s.user.id;
